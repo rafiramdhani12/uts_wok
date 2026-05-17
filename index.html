@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- JQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+
+    <!-- Tailwind + DaisyUI -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
+
+    <!-- Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <title>AnimeVerse</title>
+
+    <style>
+        * {
+            font-family: "Poppins", sans-serif;
+        }
+
+        body {
+            background: #0f172a;
+            overflow-x: hidden;
+        }
+
+        .hero-overlay-custom {
+            background: linear-gradient(to right,
+                    rgba(0, 0, 0, 0.8),
+                    rgba(0, 0, 0, 0.3));
+        }
+
+        .anime-card {
+            transition: 0.3s ease;
+        }
+
+        .anime-card:hover {
+            transform: translateY(-10px) scale(1.02);
+        }
+
+        .glow {
+            box-shadow: 0 0 30px rgba(168, 85, 247, 0.4);
+        }
+
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        }
+
+        .detailModal {
+            display: none;
+        }
+
+        .detailModal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            overflow-y: auto;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 9999;
+        }
+
+        @keyframes floating {
+            0% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 1s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body class="text-white">
+
+    <!-- NAVBAR -->
+    <header class="sticky top-0 z-50 backdrop-blur-md bg-black/40">
+        <nav class="navbar container mx-auto px-4">
+
+            <div class="flex-1">
+                <a class="text-3xl font-bold gradient-text">
+                    AnimeVerse
+                </a>
+            </div>
+
+            <div class="flex gap-2">
+                <a class="btn btn-ghost">Home</a>
+                <a href="#topAnime" class="btn btn-ghost">Top Anime</a>
+                <a class="btn btn-ghost">Popular</a>
+                <a class="btn btn-primary rounded-full">
+                    Login
+                </a>
+            </div>
+
+        </nav>
+    </header>
+
+    <main>
+
+        <!-- HERO -->
+        <section class="relative h-[85vh]">
+        
+            <div class="carousel w-full h-full" id="heroSlider">
+        
+                <!-- SLIDE-->
+        
+            </div>
+        
+        </section>
+        
+        <!-- Top Anime -->
+        <section class="container mx-auto px-4 py-20" id="topAnime">
+        
+            <div class="flex items-center justify-between mb-10">
+        
+                <div>
+                    <h2 class="text-4xl font-bold mb-2">
+                        Top Anime
+                    </h2>
+        
+                    <p class="text-gray-400">
+                        Most popular anime this season
+                    </p>
+                </div>
+        
+                <button class="btn btn-outline rounded-full">
+                    View All
+                </button>
+        
+            </div>
+        
+            <!-- SEARCH -->
+            <div class="mb-10">
+                <label class="input input-bordered flex items-center gap-2 bg-slate-900">
+                    🔍
+                    <input id="searchAnime" type="text" class="grow" placeholder="Search anime..." />
+                </label>
+            </div>
+        
+            <!-- CARD GRID -->
+            <div id="animeContainer" class="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+        
+                <!-- CARD -->
+        
+            </div>
+
+            <div id="detailContainer" class="detailModal"></div>
+        
+        </section>
+
+        <section class="container mx-auto px-4 py-20" id="recomendation">
+            <div class="flex items-center justify-between mb-10">
+            
+                <div>
+                    <h2 class="text-4xl font-bold mb-2">
+                        recomendation
+                    </h2>
+                </div>
+            
+                <button class="btn btn-outline rounded-full">
+                    View All
+                </button>
+            
+            </div>
+            <div id="recomendationContainer" class="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl-grid-cols-4 gap-8">
+
+            </div>
+        </section>
+
+    </main>
+
+   
+
+    <!-- FOOTER -->
+    <footer class="bg-black border-t border-slate-800">
+
+        <div class="container mx-auto px-4 py-10 flex flex-col md:flex-row justify-between items-center gap-5">
+
+            <div>
+                <h2 class="text-2xl font-bold gradient-text">
+                    AnimeVerse
+                </h2>
+
+                <p class="text-gray-500 mt-2">
+                    Modern Anime Streaming UI
+                </p>
+            </div>
+
+            <div class="flex gap-4">
+                <button class="btn btn-circle btn-outline">F</button>
+                <button class="btn btn-circle btn-outline">X</button>
+                <button class="btn btn-circle btn-outline">I</button>
+            </div>
+
+        </div>
+
+    </footer>
+
+    <!-- JQUERY -->
+    <script src="script.js"></script>
+
+</body>
+
+</html>
