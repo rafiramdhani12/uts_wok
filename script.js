@@ -1,24 +1,26 @@
         $(document).ready(function () {
+            // 1. AJAX: TOP ANIME (ACTION)
             $.ajax({
                 url: "https://api.jikan.moe/v4/top/anime?q=action&sfw",
                 success: function (res) {
-                    console.log(res);
-
                     let items= ''
 
                     res.data.forEach(function (item) {
                         items += `
-                            <div class="card anime-card bg-slate-900 shadow-2xl floating">
-                            <button onclick="getDetail(${item.mal_id})">
-                            <figure class="h-[300px] overflow-hidden">
-                                <img src="${item.images.jpg.image_url}" class="w-full h-full object-cover" />
-                            </figure>
-                            </button>
-                                <div class="card-body">
-                                    <h2 class="card-title">${item.title}</h2>
-                                    <p class="text-gray-400">${item.type} • ${item.episodes} Episodes</p>
-                                    <div class="rating rating-sm">
-                                        ${item.score}
+                            <div class="brutalist-card overflow-hidden group">
+                                <button onclick="getDetail(${item.mal_id})" class="w-full text-left">
+                                    <figure class="h-[400px] overflow-hidden border-b-4 border-black relative">
+                                        <img src="${item.images.jpg.large_image_url || item.images.jpg.image_url}" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-300" />
+                                        <div class="absolute top-4 left-4">
+                                            <span class="bg-black text-white px-3 py-1 font-black text-sm border-2 border-black rotate-[-2deg] inline-block">⭐ ${item.score || 'N/A'}</span>
+                                        </div>
+                                    </figure>
+                                </button>
+                                <div class="p-6">
+                                    <h2 class="text-2xl font-black italic mb-2 line-clamp-1">${item.title}</h2>
+                                    <div class="flex items-center justify-between">
+                                        <p class="font-bold uppercase text-sm tracking-tighter opacity-70">${item.type} • ${item.episodes || '?'} EPS</p>
+                                        <button onclick="getDetail(${item.mal_id})" class="brutalist-btn px-4 py-1 text-sm">INFO</button>
                                     </div>
                                 </div>
                             </div>
@@ -26,103 +28,96 @@
                     });
 
                     $("#animeContainer").html(items);
-
                 }
             })
 
-           // 2. AJAX KEDUA: HERO SLIDER (PERBAIKAN LOGIC INDEX SLIDE)
+           // 2. AJAX: HERO SLIDER (Refined Split Layout)
             $.ajax({
-                url: "https://api.jikan.moe/v4/seasons/now?sfw&limit=10",
+                url: "https://api.jikan.moe/v4/seasons/now?sfw&limit=6",
                 success: function (res) {
                     let items = '';
                     let totalItems = res.data.length;
 
                     res.data.forEach(function (item, index) {
-                        // Tentukan slide sebelum (prev) dan sesudah (next) berdasarkan index array (0 sampai total-1)
                         let currentSlideNum = index + 1;
                         let prevSlideNum = currentSlideNum === 1 ? totalItems : currentSlideNum - 1;
                         let nextSlideNum = currentSlideNum === totalItems ? 1 : currentSlideNum + 1;
 
-                        // Menggunakan large_image_url agar tidak blur di banner lebar
                         let bannerImg = item.images.jpg.large_image_url || item.images.jpg.image_url;
-                        // Ambil sinopsis pendek jika ada
-                        let synopsis = item.synopsis ? item.synopsis.substring(0, 150) + '...' : 'Explore epic stories and join the anime community.';
+                        let synopsis = item.synopsis ? item.synopsis.substring(0, 180) + '...' : 'Dive into the latest anime season and explore epic stories.';
 
                         items += `
-                        <div id="slide-hero-${currentSlideNum}" class="carousel-item relative w-full h-full">
+                        <div id="slide-hero-${currentSlideNum}" class="carousel-item relative w-full h-full bg-white flex flex-col md:flex-row overflow-hidden">
+                            <!-- Image Section -->
+                            <div class="w-full md:w-2/3 h-64 md:h-full relative overflow-hidden border-b-4 md:border-b-0 md:border-r-4 border-black">
+                                <img src="${bannerImg}" class="w-full h-full object-cover object-top" />
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent md:bg-gradient-to-r md:from-transparent md:to-black/20"></div>
+                            </div>
 
-                            <img src="${bannerImg}" class="w-full h-full object-cover object-top" />
-
-                            <div class="absolute inset-0 hero-overlay-custom"></div>
-
-                            <div class="absolute left-6 md:left-16 top-1/2 -translate-y-1/2 max-w-xl p-4 md:p-0 z-10">
-                                <span class="badge badge-primary mb-4">
-                                    NOW SHOWING THIS SEASON
+                            <!-- Content Section -->
+                            <div class="w-full md:w-1/3 p-8 flex flex-col justify-center bg-white relative">
+                                <div class="absolute top-0 right-0 bg-primary px-4 py-2 border-b-4 border-l-4 border-black font-black uppercase text-xs z-10">
+                                    SEASONAL PICK #${currentSlideNum}
+                                </div>
+                                
+                                <span class="bg-black text-white font-black px-4 py-1 text-xs mb-4 self-start uppercase tracking-widest rotate-1">
+                                    TRENDING
                                 </span>
 
-                                <h1 class="text-3xl md:text-5xl font-black leading-tight mb-4 tracking-tight drop-shadow-md">
+                                <h1 class="text-4xl md:text-5xl font-black italic leading-none mb-4 uppercase break-words">
                                     ${item.title}
                                 </h1>
 
-                                <p class="text-gray-300 text-sm md:text-base mb-6 line-clamp-3">
+                                <p class="text-sm font-bold mb-6 text-gray-700 leading-relaxed border-l-4 border-primary pl-4">
                                     ${synopsis}
                                 </p>
 
-                                <div class="flex gap-4">
-                                    <button class="btn btn-primary rounded-full px-6 md:px-8 shadow-lg">
-                                        Watch Now
+                                <div class="flex flex-wrap gap-3">
+                                    <button class="brutalist-btn px-6 py-3 text-lg bg-primary">
+                                        WATCH
                                     </button>
-                                    <button class="btn btn-outline text-white rounded-full px-6 md:px-8">
-                                        Explore
+                                    <button onclick="getDetail(${item.mal_id})" class="brutalist-btn px-6 py-3 text-lg bg-white">
+                                        DETAILS
                                     </button>
                                 </div>
-                            </div>
 
-                            <!-- Navigasi Slider Menggunakan ID Index Berurutan -->
-                            <div class="absolute left-5 right-5 top-1/2 -translate-y-1/2 flex justify-between z-20">
-                                <a href="#slide-hero-${prevSlideNum}" class="btn btn-circle btn-sm md:btn-md bg-black/40 border-none text-white hover:bg-primary">❮</a>
-                                <a href="#slide-hero-${nextSlideNum}" class="btn btn-circle btn-sm md:btn-md bg-black/40 border-none text-white hover:bg-primary">❯</a>
+                                <!-- Slider Nav -->
+                                <div class="absolute bottom-8 right-8 flex gap-4">
+                                    <a href="#slide-hero-${prevSlideNum}" class="brutalist-btn w-12 h-12 flex items-center justify-center text-2xl bg-white">❮</a>
+                                    <a href="#slide-hero-${nextSlideNum}" class="brutalist-btn w-12 h-12 flex items-center justify-center text-2xl bg-primary">❯</a>
+                                </div>
                             </div>
-
                         </div>
                     `;
                     });
 
                     $("#heroSlider").html(items);
-                },
-                error: function (err) {
-                    console.error("Gagal memuat data season hero slider:", err);
                 }
             });
 
 
+           // 3. AJAX: RECOMMENDATIONS
            $.ajax({
-                // Perbaikan tanda ? dan = pada query parameter
                 url: "https://api.jikan.moe/v4/recommendations/anime?limit=10",
                 success: function (res) {
-                    console.log(res);
                     let items = ''; 
 
                     res.data.forEach(function (item) {
-                        // Karena item.entry berbentuk array (berisi rekomendasi pasangannya), 
-                        // kita ambil entri pertama [0] agar tidak undefined.
                         let animeData = item.entry[0];
-
-                        // Definisikan gambar & judul dengan aman
                         let imgUrl = animeData.images && animeData.images.jpg ? animeData.images.jpg.image_url : 'https://placehold.co/300x400?text=No+Image';
                         let title = animeData.title || 'Unknown Title';
 
                         items += `
-                <div class="card anime-card bg-slate-900 shadow-2xl">
-                    <figure class="h-[300px] overflow-hidden">
-                        <img src="${imgUrl}" class="w-full h-full object-cover" alt="${title}" />
+                <div class="brutalist-card bg-white text-black overflow-hidden group">
+                    <figure class="h-[300px] overflow-hidden border-b-4 border-black">
+                        <img src="${imgUrl}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="${title}" />
                     </figure>
-                    <div class="card-body p-4">
-                        <h2 class="card-title text-sm md:text-base font-bold line-clamp-2" title="${title}">
+                    <div class="p-4 bg-white">
+                        <h2 class="text-xl font-black italic mb-2 line-clamp-1" title="${title}">
                             ${title}
                         </h2>
-                        <p class="text-xs text-gray-500 mt-1 italic line-clamp-2">
-                            "${item.content || 'Recommended for you'}"
+                        <p class="text-xs font-bold uppercase italic opacity-60 line-clamp-2">
+                            "${item.content || 'Must watch!'}"
                         </p>
                     </div>
                 </div>
@@ -130,17 +125,14 @@
                     });
 
                     $("#recomendationContainer").html(items);
-                },
-                error: function (xhr, status, error) {
-                    console.error("AJAX Error: ", error);
                 }
             });
         });
 
-            // 3. LOGIC LIVE FILTER SEARCH
+        // LIVE FILTER SEARCH
         $("#searchAnime").on("keyup", function () {
             let value = $(this).val().toLowerCase();
-            $("#animeContainer .card").filter(function () {
+            $("#animeContainer .brutalist-card").filter(function () {
                 $(this).toggle(
                     $(this).text().toLowerCase().indexOf(value) > -1
                 );
@@ -154,63 +146,70 @@ const getDetail = (id) => {
     $.ajax({
         url: url,
         success: function (res) {
-            console.log(res);
-
             let item = res.data;
-            // Ambil data sesuai struktur objek API asli yang kamu kirim
-            let imgUrl = item.images?.jpg?.image_url || 'https://placehold.co';
+            let imgUrl = item.images?.jpg?.large_image_url || item.images?.jpg?.image_url || 'https://placehold.co';
             let title = item.title_english || item.title || 'Unknown Title';
             let synopsis = item.synopsis || 'No Synopsis Available';
             
-            // Data tambahan dari API kamu:
             let score = item.score || 'N/A';
             let status = item.status || 'Unknown';
             let type = item.type || 'TV';
             let rating = item.rating || 'Not Rated';
 
             let items = `
-                <div class="card bg-slate-900 text-white shadow-2xl max-w-md w-full overflow-hidden relative border border-slate-800">
-                    <!-- Tombol Close (Dipindah ke sudut card agar aman dari overflow gambar) -->
-                    <button onclick="closeModal()" class="btn btn-circle btn-sm bg-black/60 border-none text-white hover:bg-red-600 absolute top-3 right-3 z-50">✕</button>
+                <div class="brutalist-card max-w-6xl w-full flex flex-col md:flex-row overflow-hidden relative max-h-[90vh] shadow-[16px_16px_0px_0px_rgba(0,0,0,1)]">
+                    <!-- Close Button -->
+                    <button onclick="closeModal()" class="brutalist-btn w-12 h-12 absolute top-6 right-6 z-50 flex items-center justify-center text-2xl bg-white hover:bg-red-500 transition-colors">✕</button>
 
-                    <figure class="h-[250px] overflow-hidden relative">
+                    <!-- Image Column -->
+                    <figure class="md:w-[35%] h-80 md:h-auto border-b-4 md:border-b-0 md:border-r-4 border-black relative shrink-0">
                         <img src="${imgUrl}" class="w-full h-full object-cover" alt="${title}" />
-                        <!-- Badge Score & Type Melayang di atas Gambar -->
-                        <div class="absolute bottom-2 left-2 flex gap-2">
-                            <span class="bg-yellow-500 text-black text-xs font-bold px-2 py-1 rounded">⭐ ${score}</span>
-                            <span class="bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded">${type}</span>
+                        <div class="absolute bottom-8 left-8">
+                            <span class="bg-primary text-black border-4 border-black px-6 py-2 font-black text-2xl rotate-[-3deg] inline-block shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">⭐ ${score}</span>
                         </div>
                     </figure>
 
-                    <div class="card-body p-5">
-                        <h2 class="card-title text-base md:text-lg font-bold text-slate-100 fallback-line-clamp" title="${title}">
-                            ${title}
-                        </h2>
-                        
-                        <!-- Info Detail Tambahan -->
-                        <div class="flex flex-wrap gap-2 my-2 text-[10px] text-gray-400">
-                            <span class="border border-gray-700 px-2 py-0.5 rounded">Status: ${status}</span>
-                            <span class="border border-gray-700 px-2 py-0.5 rounded">Rating: ${rating}</span>
+                    <!-- Content Column (Scrollable) -->
+                    <div class="md:w-[65%] p-8 md:p-14 bg-white overflow-y-auto">
+                        <div class="mb-10">
+                            <h2 class="text-4xl md:text-6xl font-black italic mb-6 leading-none uppercase break-words pr-12">
+                                ${title}
+                            </h2>
+                            
+                            <div class="flex flex-wrap gap-3 mb-10">
+                                <span class="bg-black text-white border-2 border-black px-4 py-2 font-black text-sm uppercase italic rotate-1 inline-block">Status: ${status}</span>
+                                <span class="bg-primary text-black border-2 border-black px-4 py-2 font-black text-sm uppercase italic -rotate-1 inline-block">Type: ${type}</span>
+                                <span class="bg-white text-black border-2 border-black px-4 py-2 font-black text-sm uppercase italic rotate-2 inline-block">Rating: ${rating}</span>
+                            </div>
                         </div>
 
-                        <!-- Sinopsis dengan scroll jika terlalu panjang -->
-                        <p class="text-xs text-gray-400 mt-2 italic max-h-[120px] overflow-y-auto pr-1 leading-relaxed">
-                            "${synopsis}"
-                        </p>
+                        <div class="mb-12">
+                            <h3 class="text-2xl font-black uppercase mb-6 underline decoration-8 underline-offset-8 decoration-primary italic">SYNOPSIS //</h3>
+                            <div class="relative">
+                                <div class="bg-black h-full w-2 absolute -left-6 hidden md:block"></div>
+                                <p class="text-lg md:text-xl font-bold italic leading-relaxed text-gray-800 bg-gray-50 p-6 border-l-4 md:border-l-0 border-black">
+                                    "${synopsis}"
+                                </p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             `;
             $("#detailContainer").html(items);
-            
-            // Aktifkan modal
-            modal.classList.add("active"); 
-        },
-        error: function (xhr, status, error) {
-            console.error("AJAX Error: ", error);
+            modal.classList.add("active");
+            document.body.classList.add("modal-open");
         }
     });
 }
 
 const closeModal = () => {
     modal.classList.remove("active");
+    document.body.classList.remove("modal-open");
 };
+
+const getYear = (date) => {
+    let year = new Date(date).getFullYear();
+    return year;
+}
+
+document.getElementById("year").innerHTML = getYear(new Date());
